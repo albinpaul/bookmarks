@@ -12,7 +12,7 @@ function updateTree(event) {
         results.innerHTML = ''
         const ul = document.createElement("ul")
         for(const leafNode of leafNodes){
-            if(checkMatches(leafNode[0])){
+            if(checkMatches(leafNode[0]) || checkMatches(leafNode[1].url)){
                 const li = document.createElement("li")
                 const a = document.createElement("a")
                 a.addEventListener("click", () => {
