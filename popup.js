@@ -41,4 +41,5 @@ function getBookmarks(nodes, leafNodes) {
     }
 }
 
+document.getElementById("searchBookmarks").focus()
 document.getElementById("searchBookmarks").addEventListener("keydown", updateTree)
