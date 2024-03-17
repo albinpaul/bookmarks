@@ -23,42 +23,99 @@ function generateParentsForFolder(id, currentString) {
             }
         }).catch(console.error)
 }
+
+
+const UP = 38;
+const DOWN = 40;
+const ENTER = 13;
+function rerender(leafNodes, choosenIndex) {
+    const results = document.getElementById("bookMarkResults")
+    const entries = results.querySelectorAll("li")
+    for(let node of entries) {
+        node.classList.remove("active")
+    }
+    entries[choosenIndex].className += " active"
+    entries[choosenIndex].scrollIntoView({ block: "center", behavior: "smooth" })
+
+}
+function render(leafNodes, choosenIndex) {
+    const results = document.getElementById("bookMarkResults")
+    results.innerHTML = ''
+    const ul = document.createElement("ul")
+    ul.className="list-group"
+    let leafIndex = 0
+    for(const leafNode of leafNodes){
+        const li = document.createElement("li")
+        li.className="list-group-item"
+        if(leafIndex == choosenIndex) {
+            li.className += " active"
+            li.scrollIntoView({ block: "center", behavior: "smooth" })
+        }
+        const a = document.createElement("a")
+        a.addEventListener("click", () => {
+            createBookmark(leafNode)
+        })
+        a.style.fontSize = "1.2rem"
+        generateParentsForFolder(leafNode[1].id, "")
+        .then((result)=>{
+            a.textContent = result
+            // console.log(result)
+        })
+        li.appendChild(a)
+        ul.appendChild(li)
+        leafIndex += 1
+    }
+    results.appendChild(ul)
+}
+
+const handleNonAlphaKey = async (keyCode) => {
+    let leafNodes = await chrome.storage.local.get("bookmarkSearchResult")
+    let index = await chrome.storage.local.get("bookmarkSearchIndex")
+    leafNodes = leafNodes["bookmarkSearchResult"]
+    index = index["bookmarkSearchIndex"]
+    if(keyCode == ENTER)  {
+        createBookmark(leafNodes[index])
+        window.close()
+        return
+    }
+    console.log(leafNodes, index)
+    if(keyCode == DOWN) {
+        index++;
+        index = Math.min(index, leafNodes.length - 1)
+    } else if(keyCode == UP) {
+        index--;
+        index = Math.max(index, 0)
+    } else {
+        assert(false)
+    }
+
+    await chrome.storage.local.set({"bookmarkSearchIndex": index})
+    rerender(leafNodes, index)
+
+}
 function updateTree(event) {
     const value = event.target.value
+    let keyCode = event.keyCode
+    if(keyCode == UP || keyCode == DOWN || keyCode == ENTER) {
+        handleNonAlphaKey(keyCode)
+        return
+    }
     function checkMatches(nodevalue){
         return nodevalue.toLowerCase().includes(value.toLowerCase())
     }
     chrome.bookmarks.getTree((tree) => {
         const leafNodes = []
         getBookmarks(tree[0].children, leafNodes)
-        const results = document.getElementById("bookMarkResults")
-        results.innerHTML = ''
-        const ul = document.createElement("ul")
+        let filteredLeafNodes = []
         for(const leafNode of leafNodes){
             if(checkMatches(leafNode[0])){
-                const li = document.createElement("li")
-                const a = document.createElement("a")
-                a.addEventListener("click", () => {
-                    createBookmark(leafNode)
-                })
-                if (event.keyCode === 13) {
-                    createBookmark(leafNode)
-                }
-                generateParentsForFolder(leafNode[1].id, "")
-                .then((result)=>{
-                    a.textContent = result
-                    // console.log(result)
-                })
-                li.appendChild(a)
-                console.log(leafNode[1])
-                ul.appendChild(li)
+                filteredLeafNodes.push(leafNode)
             }
         }
-        results.appendChild(ul)
+        render(filteredLeafNodes, 0)
+        chrome.storage.local.set({"bookmarkSearchResult": filteredLeafNodes})
+        chrome.storage.local.set({"bookmarkSearchIndex": 0})
     })
-    if(event.keyCode == 13) {
-        window.close()
-    }
 }
 
 
