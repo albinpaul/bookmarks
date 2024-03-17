@@ -1,5 +1,13 @@
 
-
+function createBookmark(leafNode) {
+    chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+        chrome.bookmarks.create({
+            'parentId': leafNode[1].id,
+            'title': tabs[0].title,
+            'url':tabs[0].url,
+        });
+    });
+}
 function updateTree(event) {
     const value = event.target.value
     function checkMatches(nodevalue){
@@ -16,8 +24,18 @@ function updateTree(event) {
                 const li = document.createElement("li")
                 const a = document.createElement("a")
                 a.addEventListener("click", () => {
-                    chrome.tabs.create({url: leafNode[1].url, active: false});
+                    chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+                        chrome.bookmarks.create({
+                            'parentId': leafNode[1].id,
+                            'title': tabs[0].title,
+                            'url':tabs[0].url,
+                        });
+                    });
                 })
+                console.log(event)
+                if (event.keyCode === 13) {
+                    createBookmark(leafNode)
+                }
                 a.textContent = leafNode[0]
                 li.appendChild(a)
                 console.log(leafNode[1])
@@ -32,7 +50,7 @@ function updateTree(event) {
 
 function getBookmarks(nodes, leafNodes) {
     for(const node of nodes) {
-        if(node.url) {
+        if(!node.url) {
             leafNodes.push([node.title, node])
         }
         if(node.children) {
