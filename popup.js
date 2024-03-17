@@ -8,6 +8,7 @@ function createBookmark(leafNode) {
         });
     });
 }
+
 function generateParentsForFolder(id, currentString) {
     return chrome.bookmarks
         .get(id)
@@ -24,7 +25,6 @@ function generateParentsForFolder(id, currentString) {
         }).catch(console.error)
 }
 
-
 const UP = 38;
 const DOWN = 40;
 const ENTER = 13;
@@ -36,8 +36,8 @@ function rerender(choosenIndex) {
     }
     entries[choosenIndex].className += " active"
     entries[choosenIndex].scrollIntoView({ block: "center", behavior: "smooth" })
-
 }
+
 function render(leafNodes, choosenIndex) {
     const results = document.getElementById("bookMarkResults")
     results.innerHTML = ''
@@ -91,6 +91,7 @@ const handleNonAlphaKey = async (keyCode) => {
     rerender(index)
 
 }
+
 function updateTree(event) {
     const value = event.target.value
     let keyCode = event.keyCode
@@ -119,8 +120,6 @@ function updateTree(event) {
         chrome.storage.local.set({"bookmarkSearchIndex": 0})
     })
 }
-
-
 
 function getBookmarks(nodes, leafNodes) {
     for(const node of nodes) {
