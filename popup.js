@@ -106,10 +106,14 @@ function updateTree(event) {
         getBookmarks(tree[0].children, leafNodes)
         let filteredLeafNodes = []
         for(const leafNode of leafNodes){
+            console.log(leafNode)
             if(checkMatches(leafNode[0])){
                 filteredLeafNodes.push(leafNode)
             }
         }
+        filteredLeafNodes.sort((a, b) => {
+            return b[1].dateGroupModified - a[1].dateGroupModified
+        })
         render(filteredLeafNodes, 0)
         chrome.storage.local.set({"bookmarkSearchResult": filteredLeafNodes})
         chrome.storage.local.set({"bookmarkSearchIndex": 0})
