@@ -12,7 +12,7 @@ function generateParentsForFolder(id, currentString) {
     return chrome.bookmarks
         .get(id)
         .then((node)=>{
-            let nextString = currentString + "<" + node[0].title
+            let nextString = currentString + " | " + node[0].title
             if(currentString === "") {
                 nextString = node[0].title
             }
@@ -28,7 +28,7 @@ function generateParentsForFolder(id, currentString) {
 const UP = 38;
 const DOWN = 40;
 const ENTER = 13;
-function rerender(leafNodes, choosenIndex) {
+function rerender(choosenIndex) {
     const results = document.getElementById("bookMarkResults")
     const entries = results.querySelectorAll("li")
     for(let node of entries) {
@@ -59,7 +59,6 @@ function render(leafNodes, choosenIndex) {
         generateParentsForFolder(leafNode[1].id, "")
         .then((result)=>{
             a.textContent = result
-            // console.log(result)
         })
         li.appendChild(a)
         ul.appendChild(li)
@@ -78,7 +77,6 @@ const handleNonAlphaKey = async (keyCode) => {
         window.close()
         return
     }
-    console.log(leafNodes, index)
     if(keyCode == DOWN) {
         index++;
         index = Math.min(index, leafNodes.length - 1)
@@ -90,7 +88,7 @@ const handleNonAlphaKey = async (keyCode) => {
     }
 
     await chrome.storage.local.set({"bookmarkSearchIndex": index})
-    rerender(leafNodes, index)
+    rerender(index)
 
 }
 function updateTree(event) {
