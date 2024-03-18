@@ -28,12 +28,10 @@ function generateParentsForFolder(id, currentString) {
 const UP = 38;
 const DOWN = 40;
 const ENTER = 13;
-function rerender(choosenIndex) {
+function rerender(prevIndex, choosenIndex) {
     const results = document.getElementById("bookMarkResults")
     const entries = results.querySelectorAll("li")
-    for(let node of entries) {
-        node.classList.remove("active")
-    }
+    entries[prevIndex].classList.remove("active")
     entries[choosenIndex].className += " active"
     entries[choosenIndex].scrollIntoView({ block: "center", behavior: "smooth" })
 }
@@ -77,6 +75,7 @@ const handleNonAlphaKey = async (keyCode) => {
         window.close()
         return
     }
+    let prevIndex = index
     if(keyCode == DOWN) {
         index++;
         index = Math.min(index, leafNodes.length - 1)
@@ -88,7 +87,7 @@ const handleNonAlphaKey = async (keyCode) => {
     }
 
     await chrome.storage.local.set({"bookmarkSearchIndex": index})
-    rerender(index)
+    rerender(prevIndex, index)
 
 }
 
