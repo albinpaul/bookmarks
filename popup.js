@@ -108,6 +108,7 @@ function updateTree(event) {
         for(const leafNode of leafNodes){
             console.log(leafNode)
             if(checkMatches(leafNode[0])){
+                console.log(value.toLowerCase(), leafNode[0].toLowerCase())
                 filteredLeafNodes.push(leafNode)
             }
         }
@@ -131,6 +132,6 @@ function getBookmarks(nodes, leafNodes) {
     }
 }
 
-document.getElementById("searchBookmarks").addEventListener("keydown", updateTree)
+document.getElementById("searchBookmarks").addEventListener("input", updateTree)
 document.getElementById("searchBookmarks").addEventListener("focus", updateTree)
 document.getElementById("searchBookmarks").focus()
