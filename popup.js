@@ -52,6 +52,7 @@ function render(leafNodes, choosenIndex) {
         const a = document.createElement("a")
         a.addEventListener("click", () => {
             createBookmark(leafNode)
+            window.close()
         })
         a.style.fontSize = "1.2rem"
         generateParentsForFolder(leafNode[1].id, "")
@@ -132,6 +133,6 @@ function getBookmarks(nodes, leafNodes) {
     }
 }
 
-document.getElementById("searchBookmarks").addEventListener("input", updateTree)
+document.getElementById("searchBookmarks").addEventListener("keyup", updateTree)
 document.getElementById("searchBookmarks").addEventListener("focus", updateTree)
 document.getElementById("searchBookmarks").focus()
